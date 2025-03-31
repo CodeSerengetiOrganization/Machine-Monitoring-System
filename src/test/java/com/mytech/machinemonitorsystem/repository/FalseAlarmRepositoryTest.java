@@ -23,4 +23,12 @@ public class FalseAlarmRepositoryTest {
         List<FalseAlarmMachineSummary> allFalseAlarms = falseAlarmRepository.findAll();
         Assertions.assertNotNull(allFalseAlarms);
     }
+
+    @Test
+    public void testFindByStationCode(){
+        List<FalseAlarmMachineSummary> byStationCode = falseAlarmRepository.findByMachineStationCode(4);
+        Assertions.assertNotNull(byStationCode);
+        Assertions.assertEquals(12,byStationCode.size());
+        System.out.println("byStationCode:"+byStationCode.toString());
+    }
 }

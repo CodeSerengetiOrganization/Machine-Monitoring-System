@@ -11,7 +11,7 @@
 	<groupId>com.mytech</groupId>
 	<artifactId>machinemonitorsystem</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>machinemonitorsystem</name>
 	<description>Demo project for Machine Monitor System</description>
 	<url/>
@@ -58,6 +58,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
+			<!-- GFhe provided scope excludes embedded Tomcat from your JAR. -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -78,6 +79,10 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
+<!--					added the compilerArgs to solve http500 error -->
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>

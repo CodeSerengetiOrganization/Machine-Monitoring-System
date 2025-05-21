@@ -8,10 +8,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication
 public class MachinemonitorsystemApplication extends SpringBootServletInitializer {
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(MachinemonitorsystemApplication.class);
-	}
+//	@Override
+//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//		return application.sources(MachinemonitorsystemApplication.class);
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(MachinemonitorsystemApplication.class, args);

@@ -27,25 +27,27 @@ jobs:
     - name: Find the generated WAR file
       id: find_war # Assign an ID to this step to reference its outputs
       run: |
-        # Based on your Spring Boot pom.xml:
-        # <finalName>${project.artifactId}-${project.version}</finalName>
-        # Example: if artifactId is 'your-spring-boot-backend' and version is '1.0.0-SNAPSHOT'
-        # The WAR will be 'target/your-spring-boot-backend-1.0.0-SNAPSHOT.war'
+        # Use mvn help:evaluate to get the final name of the WAR
+        # -Dexpression=project.build.finalName evaluates the finalName
+        # -q makes it quiet
+        # -DforceStdout forces output to stdout
+        # -P jboss ensures the same profile is active for correct evaluation if profiles affect name
+        FINAL_NAME=$(mvn help:evaluate -Dexpression=project.build.finalName -q -DforceStdout -f pom.xml -P jboss)
+        WAR_FILE_PATH="target/${FINAL_NAME}.war"
 
-        # Dynamically find the WAR file (more robust if name changes)
-        WAR_FILE=$(find target -name "*.war" | head -n 1) # Find any .war in target and take the first one
-
-        if [ -z "$WAR_FILE" ]; then
-          echo "ERROR: WAR file not found in 'target/' directory."
+        if [ ! -f "$WAR_FILE_PATH" ]; then
+          echo "ERROR: Expected WAR file '$WAR_FILE_PATH' not found in 'target/' directory after build."
+          echo "Listing 'target/' directory contents for debugging:"
+          ls -R target/ || true
           exit 1
         fi
 
-        echo "WAR_FILE=$WAR_FILE" >> $GITHUB_OUTPUT
-        echo "Found WAR file: $WAR_FILE" # For logging/debugging
+        echo "WAR_FILE=$WAR_FILE_PATH" >> $GITHUB_OUTPUT
+        echo "Dynamically determined WAR file: $WAR_FILE_PATH"
 
     - name: Upload WAR as a GitHub Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: spring-boot-backend-war # A meaningful name for your artifact
+        name: machinemonitorsystem-war # This is the artifact zip file name
         path: ${{ steps.find_war.outputs.WAR_FILE }} # Use the path found in the previous step
         retention-days: 30 # How long to keep the artifact (optional)

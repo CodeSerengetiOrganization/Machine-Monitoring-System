@@ -1,0 +1,51 @@
+name: Build Spring Boot WAR and Upload as Artifact
+
+on:
+  push:
+    branches:
+      - develop # Or your desired branch (e.g., develop)
+  workflow_dispatch: # Allows you to manually trigger the workflow
+
+jobs:
+  build-and-artifact:
+    runs-on: ubuntu-latest # You can also use windows-latest if your build relies on Windows specifics
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Java and Maven
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin' # Or 'adopt', 'zulu', 'oracle'
+        java-version: '17'      # Match this to your project's Java version in pom.xml
+
+    - name: Clean, Build, and Package WAR using Maven
+      # This command will compile your Java code, run tests, and produce the WAR file.
+      run: mvn clean package -f pom.xml
+
+    - name: Find the generated WAR file
+      id: find_war # Assign an ID to this step to reference its outputs
+      run: |
+        # Based on your Spring Boot pom.xml:
+        # <finalName>${project.artifactId}-${project.version}</finalName>
+        # Example: if artifactId is 'your-spring-boot-backend' and version is '1.0.0-SNAPSHOT'
+        # The WAR will be 'target/your-spring-boot-backend-1.0.0-SNAPSHOT.war'
+
+        # Dynamically find the WAR file (more robust if name changes)
+        WAR_FILE=$(find target -name "*.war" | head -n 1) # Find any .war in target and take the first one
+
+        if [ -z "$WAR_FILE" ]; then
+          echo "ERROR: WAR file not found in 'target/' directory."
+          exit 1
+        fi
+
+        echo "WAR_FILE=$WAR_FILE" >> $GITHUB_OUTPUT
+        echo "Found WAR file: $WAR_FILE" # For logging/debugging
+
+    - name: Upload WAR as a GitHub Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: spring-boot-backend-war # A meaningful name for your artifact
+        path: ${{ steps.find_war.outputs.WAR_FILE }} # Use the path found in the previous step
+        retention-days: 30 # How long to keep the artifact (optional)

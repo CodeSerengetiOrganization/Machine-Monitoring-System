@@ -2,7 +2,6 @@
 * comment all code due to ti triggers Unable to start web server
     Caused by: java.lang.IllegalStateException when mvn clean install
 * */
-/*
 package com.mytech.machinemonitorsystem.repository;
 
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
@@ -28,12 +27,17 @@ public class FalseAlarmRepositoryIntegrationTest {
 
     @PersistenceContext // Injects the EntityManager
     private EntityManager entityManager;
-
     @Test
-    public void testDatabaseConnection(){
-        List<FalseAlarmMachineSummary> allFalseAlarms = falseAlarmRepository.findAll();
-        Assertions.assertNotNull(allFalseAlarms);
+    public void testFindByMachineParametersShouldReturnListWithExpectedSize(){
+        List<FalseAlarmMachineSummary> byMachineParameters = falseAlarmRepository.findByMachineParameters(4, 104, 1);
+        Assertions.assertEquals(12,byMachineParameters.size());
     }
+
+//    @Test
+//    public void testDatabaseConnection(){
+//        List<FalseAlarmMachineSummary> allFalseAlarms = falseAlarmRepository.findAll();
+//        Assertions.assertNotNull(allFalseAlarms);
+//    }
 
 //    @Test
 //    public void testFindByStationCode(){
@@ -54,4 +58,3 @@ public class FalseAlarmRepositoryIntegrationTest {
 //        Assertions.assertTrue(falseAlarms.size() == 12);
 //    }
 }
-*/

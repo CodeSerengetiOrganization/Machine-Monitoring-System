@@ -1,5 +1,6 @@
 package com.mytech.machinemonitorsystem.controller;
 
+import com.mytech.machinemonitorsystem.dto.FailedProductDto;
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
 import com.mytech.machinemonitorsystem.service.FalseAlarmService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,11 @@ public class MachineMonitorController {
 
     @GetMapping("apis/v2/falseAlarm")
     public ResponseEntity<?> getFalseAlarms(
-                                            @RequestParam @Nullable int machineCode,
-                                            @RequestParam @Nullable int rackCode,
-                                            @RequestParam @Nullable int channelNumber
+                                            @RequestParam @Nullable Integer machineCode,
+                                            @RequestParam @Nullable Integer rackCode,
+                                            @RequestParam @Nullable Integer channelNumber
                                             ){
-        List<FalseAlarmMachineSummary> falseAlarmsForMachine = falseAlarmService.getFalseAlarmsForMachine(machineCode,rackCode,channelNumber);
+        List<FailedProductDto> falseAlarmsForMachine = falseAlarmService.getFalseAlarmsForMachine(machineCode,rackCode,channelNumber);
         return ResponseEntity.ok()
                 .body(falseAlarmsForMachine);
     }

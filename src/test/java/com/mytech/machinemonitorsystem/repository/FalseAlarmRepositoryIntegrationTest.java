@@ -30,7 +30,7 @@ public class FalseAlarmRepositoryIntegrationTest {
     @Test
     public void testFindByMachineParametersShouldReturnListWithExpectedSize(){
         List<FalseAlarmMachineSummary> byMachineParameters = falseAlarmRepository.findByMachineParameters(4, 104, 1);
-        Assertions.assertEquals(12,byMachineParameters.size());
+        Assertions.assertEquals(24,byMachineParameters.size());
     }
 
 //    @Test

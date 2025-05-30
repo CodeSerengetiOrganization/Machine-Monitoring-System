@@ -55,7 +55,35 @@ void setUp() {
 
     // Mock the behavior of the package-private helper method getAvailableRackCodeList on the SPY
     // The logic here matches the mocked logic provided in your FalseAlarmService
-    doAnswer(invocation -> {
+    doAnswer(
+            invocationOnMock -> {
+                Integer machineCode = invocationOnMock.getArgument(0);
+                List<Integer> availableRacks = new ArrayList<>();
+                if(machineCode == null || machineCode == 4){
+                    availableRacks.add(104);
+                }else{
+                    availableRacks.add(105);
+                }
+                return availableRacks;
+            }
+    ).when(falseAlarmService).getAvailableRackCodeList(any());
+
+    //this version will trigger NPE when machineCode is null, as it will try original method in real service;
+/*    when(falseAlarmService.getAvailableRackCodeList(any())).thenAnswer(
+            invocationOnMock -> {
+                Integer machineCode = invocationOnMock.getArgument(0);
+                List<Integer> availableRacks = new ArrayList<>();
+                if(machineCode == null || machineCode == 4){
+                    availableRacks.add(104);
+                }else{
+                    availableRacks.add(105);
+                }
+                return availableRacks;
+            }
+    );*/
+
+    // this version is for void version of the helper method.
+/*    doAnswer(invocation -> {
         List<Integer> list = invocation.getArgument(0);
         Integer machineCode = invocation.getArgument(1);
         list.clear(); // Clear existing elements before adding
@@ -64,17 +92,21 @@ void setUp() {
         }
         // If machineCode is not 4, list remains empty based on your mocked logic
         return null;
-    }).when(falseAlarmService).getAvailableRackCodeList(any(List.class), any());
+    }).when(falseAlarmService).getAvailableRackCodeList(any(List.class), any());*/
 
     // Mock the behavior of the package-private helper method getAvailableChannelList on the SPY
     // The logic here matches the mocked logic provided in your FalseAlarmService
-    doAnswer(invocation -> {
+
+//    when(falseAlarmService.getAvailableChannelList(any())).thenReturn(List.of(1,2));
+//    doReturn(List.of(1,2)).when(falseAlarmService.getAvailableChannelList(any()));
+    doReturn(List.of(1,2)).when(falseAlarmService).getAvailableChannelList(any());
+/*    doAnswer(invocation -> {
         List<Integer> list = invocation.getArgument(0);
         // Integer rackCode = invocation.getArgument(1); // rackCode parameter is present but not used in your mock logic
         list.clear(); // Clear existing elements before adding
         list.addAll(List.of(1, 2)); // Your mocked data for availableChannelList
         return null;
-    }).when(falseAlarmService).getAvailableChannelList(any(List.class), any());
+    }).when(falseAlarmService).getAvailableChannelList(any(List.class), any());*/
 }
 
     // --- Test Cases ---
@@ -145,12 +177,12 @@ void setUp() {
 
         // Then
         assertNotNull(result);
-        assertTrue(result.isEmpty()); // Expect an empty list as no combinations are formed
+        assertTrue(result.size() == 2); // Expect [5,105,1][5,105,2]
 
         // Verify triggerStoredProcedure was called once
         verify(falseAlarmRepository, times(1)).triggerStoredProcedure();
         // Verify findByMachineParameters was NOT called as no combinations were formed
-        verify(falseAlarmRepository, times(0)).findByMachineParameters(anyInt(), anyInt(), anyInt());
+        verify(falseAlarmRepository, times(2)).findByMachineParameters(anyInt(), anyInt(), anyInt());
     }
 
 

@@ -49,7 +49,7 @@ public class FalseAlarmService {
 
         if(rackCode == null || rackCode.equals(0)){
             //use all available racks
-            getAvailableRackCodeList(availableRackCodeList,machineCode);
+            availableRackCodeList = getAvailableRackCodeList(machineCode);
         }else{
             //use current existing rack code
             availableRackCodeList.add(rackCode);
@@ -57,7 +57,7 @@ public class FalseAlarmService {
         System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
 
         if(channelNumber == null || channelNumber.equals(0)){
-            getAvailableChannelList(availableChannelList,rackCode);
+            availableChannelList = getAvailableChannelList(rackCode);
         }else{
             availableChannelList.add(channelNumber);
         }
@@ -105,26 +105,26 @@ public class FalseAlarmService {
 
     /**
      * Get all available channel number that is on the rack
-     * @param availableChannelList the list to add channel number code
      * @param rackCode rack Id
-     * @return the modified available channel numbers that are on the provided machineCode
+     * @return the available channel numbers that are on the provided machineCode
      * */
-    void getAvailableChannelList(List<Integer> availableChannelList, Integer rackCode) {
-        availableChannelList.addAll(List.of(1,2)); //mocked data
+    List<Integer> getAvailableChannelList(Integer rackCode) {
+        return (List.of(1,2)); //mocked data
     }
 
     /**
     * Get all available rack that is compatible with provided
-    * @param availableRackCodeList the list to add rack code
     * @param machineCode machine Id
-     * @return the modified available rack code that are compatible with provided machineCode
+     * @return the available rack code that are compatible with provided machineCode
      * */
-    void getAvailableRackCodeList(List<Integer> availableRackCodeList,Integer machineCode) {
+    List<Integer> getAvailableRackCodeList(Integer machineCode) {
         //mocked logic
+        List<Integer> availableRacks = new ArrayList<>();
         if(machineCode == 4){
-            availableRackCodeList.add(104);
+            availableRacks.add(104);
+        }else{
+            availableRacks.add(105);
         }
-
-
+        return availableRacks;
     }
 }

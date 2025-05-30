@@ -120,7 +120,7 @@ public class FalseAlarmService {
     List<Integer> getAvailableRackCodeList(Integer machineCode) {
         //mocked logic
         List<Integer> availableRacks = new ArrayList<>();
-        if(machineCode == 4){
+        if(machineCode == null || machineCode.equals(4)){
             availableRacks.add(104);
         }else{
             availableRacks.add(105);

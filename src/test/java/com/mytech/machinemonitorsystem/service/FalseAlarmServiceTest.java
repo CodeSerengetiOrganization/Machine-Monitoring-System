@@ -337,6 +337,49 @@ void setUp() {
         return dto;
     }
 
+    //unit test code for inner helper method
+    @Test
+    void getAvailableRackCodeList_whenMachineCodeIsNull_returnsDefaultRack() {
+        // Given - No mocking needed for the direct method under test
+        Integer machineCode = null;
+
+        // When
+        List<Integer> result = falseAlarmService.getAvailableRackCodeList(machineCode); // Call the real method
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(104, result.get(0)); // Expecting 104 for null
+    }
+
+    @Test
+    void getAvailableRackCodeList_whenMachineCodeIs4_returnsSpecificRack() {
+        // Given
+        Integer machineCode = 4;
+
+        // When
+        List<Integer> result = falseAlarmService.getAvailableRackCodeList(machineCode);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(104, result.get(0));
+    }
+
+    @Test
+    void getAvailableRackCodeList_whenMachineCodeIsOther_returnsDefaultRack() {
+        // Given
+        Integer machineCode = 123;
+
+        // When
+        List<Integer> result = falseAlarmService.getAvailableRackCodeList(machineCode);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(105, result.get(0));
+    }
+
 //    @Test
 //    public void testGetFalseAlarmsForMachineShouldThrowExceptionWithNegativeMachineCode(){
 //        Assertions.assertThrows(IllegalArgumentException.class,()->{

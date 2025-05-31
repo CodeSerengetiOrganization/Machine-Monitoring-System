@@ -20,4 +20,16 @@ public interface FalseAlarmRepository extends JpaRepository<FalseAlarmMachineSum
     * */
     @Procedure(procedureName = "ProcessFalseAlarms")
     void triggerStoredProcedure();
+
+    /**
+     * Retrieves a list of false alarm summaries(contains the failed part data) for a specific machine, rack, and channel.
+     * This method is transactional to ensure consistency during the data retrieval process.
+     *
+     * @param machineCode   the unique code identifying the machine
+     * @param rackCode      the code identifying the rack which is compatible with the machine
+     * @param channelNumber the number identifying the specific channel of the rack to query
+     * @return a list of {@link FalseAlarmMachineSummary} objects representing the false alarms
+     */
+    @Query(value = "SELECT f FROM FalseAlarmMachineSummary f WHERE f.machineStationCode = :machineCode AND f.rackCode = :rackCode AND f.channelNumber = :channelNumber")
+    List<FalseAlarmMachineSummary> findByMachineParameters(int machineCode,int rackCode,int channelNumber);
 }

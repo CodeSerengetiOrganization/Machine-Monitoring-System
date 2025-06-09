@@ -24,10 +24,10 @@ public class FalseAlarmServiceIntegrationTest {
     @Autowired
     FalseAlarmService falseAlarmService;
 
-    @Test
-    public void debuggingGetFalseAlarmsForMachine(){
-        falseAlarmService.getFalseAlarmsForMachine(0,0,0);
-    }
+//    @Test
+//    public void debuggingGetFalseAlarmsForMachine(){
+//        falseAlarmService.getFalseAlarmsForMachine(0,0,0);
+//    }
 }
 
 

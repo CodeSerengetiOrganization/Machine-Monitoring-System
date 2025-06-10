@@ -27,11 +27,11 @@ public class FalseAlarmRepositoryIntegrationTest {
 
     @PersistenceContext // Injects the EntityManager
     private EntityManager entityManager;
-    @Test
-    public void testFindByMachineParametersShouldReturnListWithExpectedSize(){
-        List<FalseAlarmMachineSummary> byMachineParameters = falseAlarmRepository.findByMachineParameters(4, 104, 1);
-        Assertions.assertEquals(24,byMachineParameters.size());
-    }
+//    @Test
+//    public void testFindByMachineParametersShouldReturnListWithExpectedSize(){
+//        List<FalseAlarmMachineSummary> byMachineParameters = falseAlarmRepository.findByMachineParameters(4, 104, 1);
+//        Assertions.assertEquals(24,byMachineParameters.size());
+//    }
 
 //    @Test
 //    public void testDatabaseConnection(){

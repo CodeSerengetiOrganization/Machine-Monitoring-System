@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
+
 @RestController
 public class EmailTestController {
 
@@ -25,7 +27,11 @@ public class EmailTestController {
         String subject = "Alert for Machine "+machineCode;
         String templateName = "emails/alert-template";
         Context context = new Context();
-        context.setVariable("machineCode",machineCode);
+//        context.setVariable("machineName",machineCode);
+//        context.setVariable("failedAmount",7);
+        String machineUnitListStr =String.format("Machine unit: %s, failed product amount in batch: %d units.",machineCode,7);
+        context.setVariable("machineUnitListStr",machineUnitListStr);
+        context.setVariable("alertTimestamp",LocalDateTime.now());
 
         try {
             emailService.sendTemplatedHtmlEmail(to,subject,templateName,context);

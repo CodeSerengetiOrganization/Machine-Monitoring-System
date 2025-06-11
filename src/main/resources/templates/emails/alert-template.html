@@ -20,8 +20,8 @@
     <div class="content">
         <p>Dear Field Engineer Team,</p>
         <p>This is an automated alert from the Machine Monitoring System.</p>
-        <p>The machine "<span class="highlight" th:text="${machineName}">Machine XYZ</span>" has detected a critical issue:</p>
-        <p><strong>Failed Production Amount:</strong> <span class="highlight" th:text="${failedAmount}">0</span> units.</p>
+<!--        <p>The following machine unit(s) "<span class="highlight" th:text="${machineName}">Machine XYZ</span>" have detected critical issue:</p>-->
+        <p><span class="highlight" th:utext="${machineUnitListStr}">0</span></p>
         <p>Please investigate this issue immediately.</p>
         <p>Alert Timestamp: <span th:text="${#temporals.format(alertTimestamp, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
     </div>

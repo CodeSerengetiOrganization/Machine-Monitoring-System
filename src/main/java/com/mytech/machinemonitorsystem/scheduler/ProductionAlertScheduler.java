@@ -34,8 +34,6 @@ public class ProductionAlertScheduler {
 //    @Scheduled(fixedRate = 60*1000)
     @Scheduled(fixedRateString = "${app.scheduling.monitorFailedProduct.fixedRate}")
     public void monitorFailedProduction(){
-        //0.0 test
-        System.out.println("Scheduled method monitorFailedProduction is working, now:"+ LocalDateTime.now());
         Set<Integer> machineCodeInMailTitle = new HashSet<>();
         //0.define email list
         List<MachineUnit> machineUnitsForAlert =  new ArrayList<>();
@@ -74,25 +72,7 @@ public class ProductionAlertScheduler {
                                 });
                     }
                 });
-//        Iterator<MachineUnit> it = machineRackChannelCombinations.iterator();
-//        while(it.hasNext()){
-//            MachineUnit machineUnit = it.next();
-//            List<FailedProductDto> failedProductDtosForMachineUnit = falseAlarmService.getFalseAlarmsForMachine(machineUnit.getMachineId(), machineUnit.getRackId(), machineUnit.getChannelNumber());
-//            for(FailedProductDto dto:failedProductDtosForMachineUnit){
-//                List<Integer> failedProductCounts = dto.getFailedProductCount();
-//                for(Integer count:failedProductCounts){
-//                    if(count >=7){
-//                        //add this machine unit into email list
-//                        machineUnitsForAlert.add(machineUnit);
-//                        //add this machine unit into the list to shown in email title
-//                        machineCodeInMailTitle.add(machineUnit.getMachineId());
-//                        //add to failedProductMap which can help to build the machineUnitListStr
-//                        String key = ""+machineUnit.getMachineId()+"-"+machineUnit.getRackId()+"-"+machineUnit.getChannelNumber();
-//                        failedProductMap.put(key,count);
-//                    }
-//                }
-//            }
-//        }
+
         //3. based on the machineUnit list, construct email content and send email
         String[] to = defaultRecipients;
         String subject = "Alert for Machine "+ String.join(",",machineCodeInMailTitle.stream()
@@ -107,14 +87,6 @@ public class ProductionAlertScheduler {
 
         //no try-catch is needed as the service layer has handled all exceptions
         emailService.sendTemplatedHtmlEmail(to,subject,templateName,context);
-//        try {
-//            emailService.sendTemplatedHtmlEmail(to,subject,templateName,context);
-//        } catch (Exception e) {
-////            throw new RuntimeException(e);
-//            //todo: need to log it
-//            e.printStackTrace();
-//        }
-
     }
 
     private String buildContentWithMachineUnitAndFailedCount(Map<String, Integer> failedProductMap) {
@@ -125,9 +97,6 @@ public class ProductionAlertScheduler {
                 content.append(String.format("Machine unit: %s, failed product amount in batch: %d units.<br>",machineUnit,failedCount));
             });
         }
-//        content += String.format("Machine unit: %s, failed product amount in batch: %d units.",machineCode,7);
         return content.toString();
     }
-
-
 }

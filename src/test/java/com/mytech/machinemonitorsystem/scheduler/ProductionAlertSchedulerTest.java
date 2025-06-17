@@ -5,20 +5,13 @@ import com.mytech.machinemonitorsystem.entity.MachineUnit;
 import com.mytech.machinemonitorsystem.service.EmailService;
 import com.mytech.machinemonitorsystem.service.FalseAlarmService;
 import com.mytech.machinemonitorsystem.service.MachineLineService;
-import jakarta.inject.Inject;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.thymeleaf.context.Context;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,8 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
-//@SpringBootTest
-//@ActiveProfiles({"local"})
 public class ProductionAlertSchedulerTest {
 
     @Mock
@@ -124,17 +115,9 @@ public class ProductionAlertSchedulerTest {
         Assertions.assertTrue(machineUnitListStr.contains("Machine unit: 5-105-3, failed product amount in batch: 7 units.<br>"));
         LocalDateTime alertTimestamp = (LocalDateTime) capturedValue.getVariable("alertTimestamp");
         Assertions.assertNotNull(alertTimestamp);
-//        // Assert the content of the email context
-//        Context capturedContext = contextCaptor.getValue();
-//        assertNotNull(capturedContext);
-//        String machineUnitListStr = (String) capturedContext.getVariable("machineUnitListStr");
-//        assertNotNull(machineUnitListStr);
-//        assertTrue(machineUnitListStr.contains("Machine unit: 5-105-3, failed product amount in batch: 8 units.<br>"));
-//        assertTrue(machineUnitListStr.contains("Machine unit: 6-106-4, failed product amount in batch: 7 units.<br>"));
-//        assertNotNull(capturedContext.getVariable("alertTimestamp"));
 
     }
-    //if machineRackChannelCombinations is null,machineLineService.getMachineRackChannelCombinations should not be called--not possible as it returns HashSet
+
     //if machineRackChannelCombinations is empty,machineLineService.getMachineRackChannelCombinations should not be called
     @Test
     public void testMonitorFailedProductionSendsEmailWhenMachineRackChannelCombinationsIsEmpty(){
@@ -147,24 +130,4 @@ public class ProductionAlertSchedulerTest {
 //        Mockito.never(falseAlarmService.getFalseAlarmsForMachine());
         Mockito.verifyNoInteractions(falseAlarmService);
     }
-
-    //if emailService has exception, should handle--we do not need it as emailService is designed to handle all exceptions.
-/*    @Test
-    public void testMonitorFailedProductionShouldHandleExcepitonWhenSendingEmail(){
-        //given
-//        Mockito.when(emailService.sendTemplatedHtmlEmail(any(),any(),any()))
-//                .thenThrow(new MessagingException("mocked MessagingException"));
-        Mockito.when(machineLineService.getMachineRackChannelCombinations())
-                .thenReturn(machineRackChannelCombinations);
-        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(5,105, 3))
-                .thenReturn(failedProductDtosForMachineUnit1);
-        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(6,106, 4))
-                .thenReturn(failedProductDtosForMachineUnit2);
-        Mockito.doThrow(new MessagingException("mocked MessagingException"))
-                .when(emailService).sendTemplatedHtmlEmail(any(),any(),any(),any());
-        // when
-        productionAlertScheduler.monitorFailedProduction();
-        //then emailService still try to send email
-        Mockito.verify(emailService).sendTemplatedHtmlEmail(any(),any(),any(),any());
-    }*/
 }

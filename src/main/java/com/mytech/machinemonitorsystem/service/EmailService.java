@@ -30,7 +30,7 @@ public class EmailService {
 //            System.out.println("Processed email content: " + htmlContent);
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom("qiang.serengeti@gmail.com");    // Must match configured username
+            helper.setFrom("${MAIL_USERNAME}");
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);

@@ -4,6 +4,7 @@ import com.mytech.machinemonitorsystem.dto.FailedProductDto;
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
 import com.mytech.machinemonitorsystem.service.FalseAlarmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;

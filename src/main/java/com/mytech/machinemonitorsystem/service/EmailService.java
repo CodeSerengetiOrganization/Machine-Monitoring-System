@@ -3,7 +3,6 @@ package com.mytech.machinemonitorsystem.service;
 import com.mytech.machinemonitorsystem.helper.MimeMessageHelperFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
@@ -15,12 +14,12 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Service
 public class EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private SpringTemplateEngine templateEngine;
-    @Autowired
-    private MimeMessageHelperFactory mimeMessageHelperFactory;
+
+    private final JavaMailSender mailSender;
+
+    private final SpringTemplateEngine templateEngine;
+
+    private final MimeMessageHelperFactory mimeMessageHelperFactory;
 
     @Value("${spring.mail.properties.mail.smtp.timeout}")
     private int smtpTimeout;
@@ -28,29 +27,11 @@ public class EmailService {
     @Value("${MAIL_USERNAME}")
     private String mailUserName;
 
-//    public int getSmtpTimeout(){
-//        return this.smtpTimeout;
-//    }
-//    public void setSmtpTimeout(int smtpTimeout){
-//        this.smtpTimeout = smtpTimeout;
-//    }
-//
-//    public String getMailUserName(){
-//        return this.mailUserName;
-//    }
-//    public void setMailUserName(String mailUserName){
-//        this.mailUserName = mailUserName;
-//    }
-    public EmailService(){}
-//    @Autowired
-    public EmailService(JavaMailSender mailSender,SpringTemplateEngine templateEngine,String mailUserName, int smtpTimeout){
+    public EmailService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, MimeMessageHelperFactory mimeMessageHelperFactory){
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
-        this.mailUserName = mailUserName;
-        this.smtpTimeout = smtpTimeout;
+        this.mimeMessageHelperFactory = mimeMessageHelperFactory;
     }
-
-
 
     //    @Async  //execute this method in a separate thread--it does not work,so have to comment it.
     public void sendTemplatedHtmlEmail(String[] to, String subject, String templateName, Context variables){

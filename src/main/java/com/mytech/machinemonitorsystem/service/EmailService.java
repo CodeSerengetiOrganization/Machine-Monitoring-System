@@ -1,5 +1,6 @@
 package com.mytech.machinemonitorsystem.service;
 
+import com.mytech.machinemonitorsystem.helper.MimeMessageHelperFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -19,24 +19,54 @@ public class EmailService {
     private JavaMailSender mailSender;
     @Autowired
     private SpringTemplateEngine templateEngine;
+    @Autowired
+    private MimeMessageHelperFactory mimeMessageHelperFactory;
 
     @Value("${spring.mail.properties.mail.smtp.timeout}")
     private int smtpTimeout;
 
-//    @Async  //execute this method in a separate thread--it does not work,so have to comment it.
+    @Value("${MAIL_USERNAME}")
+    private String mailUserName;
+
+//    public int getSmtpTimeout(){
+//        return this.smtpTimeout;
+//    }
+//    public void setSmtpTimeout(int smtpTimeout){
+//        this.smtpTimeout = smtpTimeout;
+//    }
+//
+//    public String getMailUserName(){
+//        return this.mailUserName;
+//    }
+//    public void setMailUserName(String mailUserName){
+//        this.mailUserName = mailUserName;
+//    }
+    public EmailService(){}
+//    @Autowired
+    public EmailService(JavaMailSender mailSender,SpringTemplateEngine templateEngine,String mailUserName, int smtpTimeout){
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+        this.mailUserName = mailUserName;
+        this.smtpTimeout = smtpTimeout;
+    }
+
+
+
+    //    @Async  //execute this method in a separate thread--it does not work,so have to comment it.
     public void sendTemplatedHtmlEmail(String[] to, String subject, String templateName, Context variables){
         try {
             String htmlContent = templateEngine.process(templateName, variables);
 //            System.out.println("Processed email content: " + htmlContent);
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom("${MAIL_USERNAME}");
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = mimeMessageHelperFactory.createMimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(this.mailUserName);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            System.out.println("smtpTimeout:"+smtpTimeout);//for debug
+//            System.out.println("smtpTimeout:"+smtpTimeout);//for debug
             mailSender.send(message);
-            System.out.println("Async HTML alert email sent to " + String.join(", ", to) + " at " + System.currentTimeMillis());
+//            System.out.println("Async HTML alert email sent to " + String.join(", ", to) + " at " + System.currentTimeMillis());
 //        }catch ()
 
         } catch (MessagingException me){

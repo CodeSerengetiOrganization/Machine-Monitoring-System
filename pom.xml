@@ -63,19 +63,19 @@
 					<groupId>org.apache.tomcat.embed</groupId>
 					<artifactId>tomcat-embed-el</artifactId>
 				</exclusion>
-				<exclusion>
+<!--				<exclusion>
 					<groupId>org.apache.tomcat.embed</groupId>
 					<artifactId>tomcat-embed-logging-juli</artifactId>
 				</exclusion>
-				<!--				xclude spring-boot-starter-logging, this is to build war package for Jboss-->
+				&lt;!&ndash;				xclude spring-boot-starter-logging, this is to build war package for Jboss&ndash;&gt;
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
-				<!--				Exclude Log4j2 Dependencies, as JBoss WildFly will provide it-->
+				&lt;!&ndash;				Exclude Log4j2 Dependencies, as JBoss WildFly will provide it&ndash;&gt;
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
+					<artifactId>log4j-api</artifactId>loggi
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -84,7 +84,7 @@
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
+				</exclusion>-->
 			</exclusions>
 		</dependency>
 		<dependency>

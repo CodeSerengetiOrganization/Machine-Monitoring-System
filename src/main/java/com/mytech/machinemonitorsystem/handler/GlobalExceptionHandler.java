@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
         Object invalidValue = ex.getValue();
         String parameterName = ex.getName();
-        String requiredType = ex.getRequiredType() == null ? "unkown" : ex.getRequiredType().getSimpleName();
+        String requiredType = ex.getRequiredType() == null ? "unknown" : ex.getRequiredType().getSimpleName();
         String message = String.format("Invalid value %s provided for parameter %s. Expected type: %s", invalidValue, parameterName, requiredType);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST,"PARAMETER_TYPE_MISMATCH",message);
         return ResponseEntity.badRequest().body(errorResponse);
@@ -36,6 +36,13 @@ public class GlobalExceptionHandler {
         logger.warn("GlobalExceptionHandler caught NoHandlerFoundException:{}",ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "The requested API endpoint does not exist. Please check your URL.");
         return  new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex){
+        //IllegalArgumentException
+        logger.warn("GlobalExceptionHandler caught IllegalArgumentException:{}",ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "ILLEGAL_ARGUMENT",ex.getMessage());
+        return  new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

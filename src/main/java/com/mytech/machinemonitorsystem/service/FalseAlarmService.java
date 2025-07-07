@@ -33,13 +33,13 @@ public class FalseAlarmService {
         Set<List<Integer>> combinations =  new HashSet<List<Integer>>();
         int mockedBatchSize = 200;  //temperily harde code the mocked data
         //1. pre-check of input parameters
-        if(machineCode < 0){
+        if(machineCode !=null && machineCode < 0){
             throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
         }
-        if(rackCode < 0){
+        if(rackCode !=null && rackCode < 0){
             throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
         }
-        if(channelNumber < 0){
+        if(channelNumber!=null && channelNumber < 0){
             throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
         }
         if(machineCode == null || machineCode.equals(0)){

@@ -1,7 +1,6 @@
 package com.mytech.machinemonitorsystem.repository;
 
 import com.mytech.machinemonitorsystem.entity.FailedProductCumulative;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,10 +43,7 @@ public class FailedProductRepositoryIntegrationTest {
     @Test
     public void shouldFindEntityByProductCode_whenExists() {
         List<FailedProductCumulative> results = failedProductRepository.findByProductCode(11664L);
-        System.out.println("Results size: " + results.size());
-        System.out.println("Results: " + results.toString());
         Assertions.assertNotNull(results);
-        Assertions.assertFalse(results.isEmpty());
         Assertions.assertEquals(1, results.size());
     }
 

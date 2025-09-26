@@ -32,7 +32,7 @@ public class ProductionAlertScheduler {
     }
 
 
-    @Scheduled(fixedRateString = "${app.scheduling.monitorFailedProduct.fixedRate}")
+//    @Scheduled(fixedRateString = "${app.scheduling.monitorFailedProduct.fixedRate}")
     public void monitorFailedProduction(){
         Set<Integer> machineCodeInMailTitle = new HashSet<>();
         //0.define email list

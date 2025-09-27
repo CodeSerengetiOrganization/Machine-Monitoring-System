@@ -135,7 +135,15 @@ public class FalseAlarmService {
         //mocked logic
         return 4800;
     }
-    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int range, List<FailedProductCumulative> failedCumulativeList){
+    /*
+    * This method is to calculate the failed product count in each batch
+    * @param latestSeq the latest product sequence number
+    * @param batchSize the size of each batch
+    * @param analyzeRange the analyzeRange of how many batches to calculate(it should be multiple of batchSize)
+    * @param failedCumulativeList the list of FailedProductCumulative objects containing product sequence and cumulative fail count
+    * @return a list of Long values representing the failed product count in each batch
+    * */
+    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int analyzeRange, List<FailedProductCumulative> failedCumulativeList){
         if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -170,7 +178,7 @@ public class FalseAlarmService {
         //need a resultlist
         List<Long> resultList =new ArrayList<>();
 
-        while(seqIndex < seqList.size()){
+        while(seqIndex < seqList.size() && batchCounter<= analyzeRange){
 
             //no fialed product in the batch
             if(seqList.get(seqIndex) < batchEndSeq){

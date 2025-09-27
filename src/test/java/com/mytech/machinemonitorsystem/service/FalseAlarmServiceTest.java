@@ -453,7 +453,7 @@ void setUp() {
         // call your method
         int latestSeq = 4800;   // your mocked getLatestProductSequence
         int batchSize = 100;    // example batch size
-        int range = 0;          // currently unused in your code
+        int range = 5;          // currently unused in your code
 
 //        MyServiceUnderTest service = new MyServiceUnderTest();
 
@@ -461,7 +461,8 @@ void setUp() {
 
         // verify result is not empty
         assertNotNull(result);
-        assertFalse(result.isEmpty());
+//        assertFalse(result.isEmpty());
+        assertEquals(range,result.size());
 
         // print for debugging
         System.out.println("Failed product counts per batch: " + result);

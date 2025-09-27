@@ -1,16 +1,15 @@
 package com.mytech.machinemonitorsystem.service;
 
 import com.mytech.machinemonitorsystem.dto.FailedProductDto;
+import com.mytech.machinemonitorsystem.entity.FailedProductCumulative;
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
 import com.mytech.machinemonitorsystem.repository.FalseAlarmRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FalseAlarmService {
@@ -127,4 +126,95 @@ public class FalseAlarmService {
         }
         return availableRacks;
     }
+
+    //create comment for this method
+    /*
+    * */
+
+    private int getLatestProductSequence(){
+        //mocked logic
+        return 4800;
+    }
+    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int range, List<FailedProductCumulative> failedCumulativeList){
+        if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> resultArray = new ArrayList<>();
+
+        // Sort descending by productSequence
+        List<FailedProductCumulative> sortedList = failedCumulativeList.stream()
+                .sorted(Comparator.comparing(FailedProductCumulative::getProductSequence).reversed())
+                .collect(Collectors.toList());
+
+        //create 2 helper list
+        List<Long> seqList =new ArrayList<>();
+        List<Long> cumuList =new ArrayList<>();
+        for(FailedProductCumulative item:sortedList){
+            seqList.add(item.getProductSequence());
+            cumuList.add(item.getCumulativeFailCount());
+        }
+        System.out.println("seqList:"+seqList.toString());
+        System.out.println("cumuList:"+cumuList.toString());
+
+        int batchCounter =1;
+        // need 2 parameter for batch window
+        long batchStartSeq = latestSeq;
+        long batchEndSeq = latestSeq-batchSize+1 >=0 ? latestSeq-batchSize+1:0;
+
+
+        //need 2 index for seqList
+        int seqStartIndex = 0;
+        int seqEndIndex = 0;
+        int seqIndex = 0;
+
+        //need a resultlist
+        List<Long> resultList =new ArrayList<>();
+
+        while(seqIndex < seqList.size()){
+
+            //no fialed product in the batch
+            if(seqList.get(seqIndex) < batchEndSeq){
+                resultList.add(0L);
+                System.out.println(String.format("No failed part in this batch.batchStartSeq: %d,batchEndSeq: %d",batchStartSeq,batchEndSeq));
+//                seqIndex++;
+                batchCounter++;
+                batchStartSeq = batchEndSeq-1;
+//                batchEndSeq = latestSeq-batchSize*batchCounter >=0 ? latestSeq-batchSize*batchCounter+1:0;
+                batchEndSeq = batchEndSeq-batchSize >=0 ? batchEndSeq-batchSize:0;
+
+
+                continue;
+            }
+            if(seqList.get(seqIndex) > latestSeq){
+                throw new IllegalArgumentException(String.format("The Sequence in the list is larger than current latest Sequence, it is not normal.Current sequence: %d, StartSeq: %d",seqList.get(seqIndex),batchStartSeq));
+            }
+            //find the start index
+            if(seqList.get(seqIndex)< batchStartSeq &&seqList.get(seqIndex)>batchEndSeq){
+                seqStartIndex=seqIndex;
+            }
+            //find the end index
+            while(seqIndex< seqList.size() && seqList.get(seqIndex)>= batchEndSeq) {
+                seqIndex++;
+            }
+//            seqIndex-=1;
+            seqEndIndex=seqIndex-1;
+
+            long failedCount = cumuList.get(seqStartIndex) - cumuList.get(seqEndIndex)+1;
+            resultList.add(failedCount);
+            System.out.println("seqStartIndex:"+seqStartIndex+";seqEndIndex:"+seqEndIndex);
+            System.out.println("batchStartSeq:"+batchStartSeq+";batchEndSeq:"+batchEndSeq);
+
+            System.out.println("failedCount:"+failedCount);
+            //move to next batch
+            batchCounter++;
+            batchStartSeq = latestSeq - batchSize*(batchCounter-1);
+            batchEndSeq = latestSeq - batchSize*batchCounter+1 >=0 ? latestSeq - batchSize*batchCounter+1:0;
+//            seqIndex++;
+        }
+
+
+        System.out.println("resultList:"+resultList.toString());
+        return resultList;
+    }
+
 }

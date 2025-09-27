@@ -1,6 +1,7 @@
 package com.mytech.machinemonitorsystem.service;
 
 import com.mytech.machinemonitorsystem.dto.FailedProductDto;
+import com.mytech.machinemonitorsystem.entity.FailedProductCumulative;
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
 import com.mytech.machinemonitorsystem.repository.FalseAlarmRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -380,6 +383,89 @@ void setUp() {
         assertEquals(105, result.get(0));
     }
 
+    @Test
+    void testCalculateFailedProductCountInBatch() {
+        // build test data
+        List<FailedProductCumulative> failedList = new ArrayList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime createdAt = LocalDateTime.parse("2025-09-19 23:42:43", dtf);
+
+        long[][] data = {
+                {2, 112233, 101, 1, 4, 1},
+                {3, 112233, 102, 2, 4, 1},
+                {4, 112233, 151, 3, 4, 1},
+                {5, 112233, 152, 4, 4, 1},
+                {6, 112233, 201, 5, 4, 1},
+                {7, 112233, 202, 6, 4, 1},
+                {8, 112233, 251, 7, 4, 1},
+                {9, 112233, 252, 8, 4, 1},
+                {10, 112233, 601, 9, 4, 1},
+                {11, 112233, 602, 10, 4, 1},
+                {12, 112233, 3001, 11, 4, 1},
+                {13, 112233, 3002, 12, 4, 1},
+                {14, 112233, 3351, 13, 4, 1},
+                {15, 112233, 3352, 14, 4, 1},
+                {16, 112233, 3451, 15, 4, 1},
+                {17, 112233, 3452, 16, 4, 1},
+                {18, 112233, 3701, 17, 4, 1},
+                {19, 112233, 3702, 18, 4, 1},
+                {20, 112233, 3801, 19, 4, 1},
+                {21, 112233, 3802, 20, 4, 1},
+                {22, 112233, 3901, 21, 4, 1},
+                {23, 112233, 3902, 22, 4, 1},
+                {24, 112233, 4051, 23, 4, 1},
+                {25, 112233, 4052, 24, 4, 1},
+                {26, 112233, 4101, 25, 4, 1},
+                {27, 112233, 4102, 26, 4, 1},
+                {28, 112233, 4201, 27, 4, 1},
+                {29, 112233, 4202, 28, 4, 1},
+                {30, 112233, 4301, 29, 4, 1},
+                {31, 112233, 4302, 30, 4, 1},
+                {32, 112233, 4351, 31, 4, 1},
+                {33, 112233, 4352, 32, 4, 1},
+                {34, 112233, 4451, 33, 4, 1},
+                {35, 112233, 4452, 34, 4, 1},
+                {36, 112233, 4501, 35, 4, 1},
+                {37, 112233, 4502, 36, 4, 1},
+                {38, 112233, 4551, 37, 4, 1},
+                {39, 112233, 4552, 38, 4, 1},
+                {40, 112233, 4651, 39, 4, 1},
+                {41, 112233, 4652, 40, 4, 1},
+                {42, 112233, 4701, 41, 4, 1},
+                {43, 112233, 4702, 42, 4, 1},
+                {44, 112233, 4751, 43, 4, 1},
+                {45, 112233, 4752, 44, 4, 1},
+                {46, 112233, 4791, 45, 4, 1}
+        };
+
+        for (long[] row : data) {
+            FailedProductCumulative fpc = new FailedProductCumulative();
+            fpc.setId(row[0]);
+            fpc.setProductCode(row[1]);
+            fpc.setProductSequence(row[2]);
+            fpc.setCumulativeFailCount(row[3]);
+            fpc.setStationCode(row[4]);
+            fpc.setStationChannelNumber(row[5]);
+            fpc.setCreatedAt(createdAt);
+            failedList.add(fpc);
+        }
+
+        // call your method
+        int latestSeq = 4800;   // your mocked getLatestProductSequence
+        int batchSize = 100;    // example batch size
+        int range = 0;          // currently unused in your code
+
+//        MyServiceUnderTest service = new MyServiceUnderTest();
+
+        List<Long> result = falseAlarmService.calculateFailedProductCountInBatch(latestSeq, batchSize, range, failedList);
+
+        // verify result is not empty
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+
+        // print for debugging
+        System.out.println("Failed product counts per batch: " + result);
+    }
 //    @Test
 //    public void testGetFalseAlarmsForMachineShouldThrowExceptionWithNegativeMachineCode(){
 //        Assertions.assertThrows(IllegalArgumentException.class,()->{

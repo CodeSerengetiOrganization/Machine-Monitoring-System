@@ -83,17 +83,11 @@ public class FalseAlarmService {
             for(int i=0;i<combination.size();i++){
                 System.out.println(combination.get(i));
             }
-//
-//            List<FalseAlarmMachineSummary> falseAlarmDataList = falseAlarmRepository.findByMachineParameters(combination.get(0),combination.get(1),combination.get(2));
-//            System.out.println("falseAlarmDataList in loop:"+falseAlarmDataList.toString());
-//            //construct dto based on retrieved data,put into the list to return
-//            List<Integer> failedProductCountList =new ArrayList<>();
-//            for(FalseAlarmMachineSummary summary:falseAlarmDataList){
-//                failedProductCountList.add(summary.getFalseAlarmCount());
-//            }
-        long latestProductSequence = getLatestProductSequence();
-        int mockedAnalyzeRange = 10; //temperily harde code the mocked data
-        List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
+
+            long latestProductSequence = getLatestProductSequence();
+            //todo: reomove the hard coded data
+            int mockedAnalyzeRange = 10; //temporarily hard code the mocked data
+            List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
             List<Long> failedProductCountList = calculateFailedProductCountInBatch(latestProductSequence, mockedBatchSize, mockedAnalyzeRange, failedCumulativeList);
             FailedProductDto dto =new FailedProductDto();
             dto.setMachineId(combination.get(0));
@@ -103,10 +97,8 @@ public class FalseAlarmService {
 
             dto.setFailedProductCount(failedProductCountList);
             FailedProductDtos.add(dto);
-//            falseAlarms.addAll(falseAlarmDataList);
         }
-//        System.out.println("falseAlarms:"+falseAlarms.toString());
-        System.out.println("FailedProductDtos:"+FailedProductDtos.toString());
+//        System.out.println("FailedProductDtos:"+FailedProductDtos.toString());
         return FailedProductDtos;
     }
 

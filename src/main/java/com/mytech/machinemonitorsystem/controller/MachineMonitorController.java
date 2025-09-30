@@ -27,9 +27,9 @@ public class MachineMonitorController {
 
     @GetMapping("apis/v2/falseAlarm")
     public ResponseEntity<?> getFalseAlarms(
-                                            @RequestParam @Nullable Integer machineCode,
-                                            @RequestParam @Nullable Integer rackCode,
-                                            @RequestParam @Nullable Integer channelNumber
+                                            @RequestParam @Nullable Long machineCode,
+                                            @RequestParam @Nullable Long rackCode,
+                                            @RequestParam @Nullable Long channelNumber
                                             ){
         logger.info("Received GET request for /apis/v2/falseAlarm,with parameters: apis/v2/falseAlarm:{},rackCode:{},channelNumber:{}",machineCode
                 ,rackCode,channelNumber);

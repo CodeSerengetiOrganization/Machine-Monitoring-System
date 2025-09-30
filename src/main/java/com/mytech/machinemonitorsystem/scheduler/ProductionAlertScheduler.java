@@ -34,10 +34,10 @@ public class ProductionAlertScheduler {
 
 //    @Scheduled(fixedRateString = "${app.scheduling.monitorFailedProduct.fixedRate}")
     public void monitorFailedProduction(){
-        Set<Integer> machineCodeInMailTitle = new HashSet<>();
+        Set<Long> machineCodeInMailTitle = new HashSet<>();
         //0.define email list
         List<MachineUnit> machineUnitsForAlert =  new ArrayList<>();
-        Map<String, Integer> failedProductMap = new HashMap<>();
+        Map<String, Long> failedProductMap = new HashMap<>();
         //1. get failed production count for each combination of machineId+RackId+channelNumber use the count of last batch
         Set<MachineUnit> machineRackChannelCombinations = machineLineService.getMachineRackChannelCombinations();
         //2. check each combination, any one who reach the criteria, put into alertEmailMap
@@ -54,7 +54,7 @@ public class ProductionAlertScheduler {
                         failedProductDtosForMachineUnit.stream()
                                 .filter(Objects::nonNull)
                                 .forEach(dto->{
-                                    List<Integer> failedProductCounts = dto.getFailedProductCount();
+                                    List<Long> failedProductCounts = dto.getFailedProductCount();
                                     if(failedProductCounts !=null){
                                         failedProductCounts.stream()
                                                 .filter(count->count>=7)
@@ -89,7 +89,7 @@ public class ProductionAlertScheduler {
         emailService.sendTemplatedHtmlEmail(to,subject,templateName,context);
     }
 
-    private String buildContentWithMachineUnitAndFailedCount(Map<String, Integer> failedProductMap) {
+    private String buildContentWithMachineUnitAndFailedCount(Map<String, Long> failedProductMap) {
 //        String content = "";
         StringBuilder content = new StringBuilder();
         if(failedProductMap != null && !failedProductMap.isEmpty()){

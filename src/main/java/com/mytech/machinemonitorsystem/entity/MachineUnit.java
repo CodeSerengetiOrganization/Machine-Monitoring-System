@@ -9,40 +9,42 @@ import java.util.Map;
 //@NoArgsConstructor
 public class MachineUnit {
 
-    private int machineId;
-    private int rackId;
-    private int channelNumber;
-    // --- Constructor
-    public MachineUnit(int machineId, int rackId, int channelNumber) {
+    private long machineId;
+    private long rackId;
+    private long channelNumber;
+
+    // --- Constructors ---
+    public MachineUnit(long machineId, long rackId, long channelNumber) {
         this.machineId = machineId;
         this.rackId = rackId;
         this.channelNumber = channelNumber;
     }
-    public MachineUnit(){}
+
+    public MachineUnit() {}
 
     // --- Getters ---
-    public int getMachineId() {
+    public long getMachineId() {
         return machineId;
     }
 
-    public int getRackId() {
+    public long getRackId() {
         return rackId;
     }
 
-    public int getChannelNumber() {
+    public long getChannelNumber() {
         return channelNumber;
     }
 
     // --- Setters ---
-    public void setMachineId(int machineId) {
+    public void setMachineId(long machineId) {
         this.machineId = machineId;
     }
 
-    public void setRackId(int rackId) {
+    public void setRackId(long rackId) {
         this.rackId = rackId;
     }
 
-    public void setChannelNumber(int channelNumber) {
+    public void setChannelNumber(long channelNumber) {
         this.channelNumber = channelNumber;
     }
 
@@ -57,8 +59,6 @@ public class MachineUnit {
     }
 
     // --- equals() and hashCode() ---
-    // These two methods should always be overridden together if you override one.
-    // They are crucial for correct behavior in collections like HashMap or HashSet.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,17 +71,7 @@ public class MachineUnit {
 
     @Override
     public int hashCode() {
-        // A common way to generate hash code using relevant fields
-        int result = machineId;
-        result = 31 * result + rackId;
-        result = 31 * result + channelNumber;
-        return result;
-        // Or using Java's Objects.hash() (Java 7+) for conciseness:
-        // return Objects.hash(machineId, rackId, channelNumber);
+        // Use Objects.hash for clarity (Java 7+)
+        return java.util.Objects.hash(machineId, rackId, channelNumber);
     }
-
-    //    private Map<Integer, String > machineIdNameMap;
-//    private Map<Integer, String > rackIdNameMap;
-    //    private String machineName;
-    //    private String rackName;
 }

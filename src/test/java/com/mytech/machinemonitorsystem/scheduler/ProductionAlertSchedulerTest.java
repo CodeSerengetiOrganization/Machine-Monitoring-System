@@ -48,13 +48,13 @@ public class ProductionAlertSchedulerTest {
 
         //mock the failed product dtos,make sure use the machine+rack+channels combination in getMachineRackChannelCombinations()
         this.failedProductDtosForMachineUnit1 = new ArrayList<>();
-        FailedProductDto dto1 =  new FailedProductDto(5,105,3,200,List.of(3,2,0,0,0,6,7,8));
+        FailedProductDto dto1 =  new FailedProductDto(5L,105L,3L,200,List.of(3L,2L,0L,0L,0L,6L,7L,8L));
 //        FailedProductDto dto2 =  new FailedProductDto(5,105,4,200,List.of(3,2,0,0,0,1,2,3));
         failedProductDtosForMachineUnit1.add(dto1);
 //        failedProductDtosForMachineUnit1.add(dto2);
 
         this.failedProductDtosForMachineUnit2 = new ArrayList<>();
-        FailedProductDto dto3 =  new FailedProductDto(5,106,4,200,List.of(3,2,0,0,0,1,2,3));
+        FailedProductDto dto3 =  new FailedProductDto(5L,106L,4L,200,List.of(3L,2L,0L,0L,0L,1L,2L,3L));
 //        FailedProductDto dto4 =  new FailedProductDto(5,106,6,200,List.of(1,2,0,0,0,1,2,3));
         failedProductDtosForMachineUnit2.add(dto3);
 //        failedProductDtosForMachineUnit2.add(dto4);
@@ -86,9 +86,9 @@ public class ProductionAlertSchedulerTest {
         //give
         Mockito.when(machineLineService.getMachineRackChannelCombinations())
                 .thenReturn(machineRackChannelCombinations);
-        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(5,105, 3))
+        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(5L,105L, 3L))
                 .thenReturn(failedProductDtosForMachineUnit1);
-        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(6,106, 4))
+        Mockito.when(falseAlarmService.getFalseAlarmsForMachine(6L,106L, 4L))
                 .thenReturn(failedProductDtosForMachineUnit2);
         //when
         productionAlertScheduler.monitorFailedProduction();

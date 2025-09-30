@@ -16,6 +16,9 @@ public class FalseAlarmService {
     @Autowired
     FalseAlarmRepository falseAlarmRepository;
 
+    @Autowired
+    FailedProductService failedProductService;
+
     /**
      * Retrieves a list of false alarm summaries(contains the failed part data) for a specific machine, rack, and channel.
      * This method is transactional to ensure consistency during the data retrieval process.
@@ -26,27 +29,27 @@ public class FalseAlarmService {
      * @return a list of {@link FalseAlarmMachineSummary} objects representing the false alarms
      */
     @Transactional
-    public List<FailedProductDto> getFalseAlarmsForMachine(Integer machineCode,Integer rackCode,Integer channelNumber){
-        List<Integer> availableRackCodeList = new ArrayList<>();
-        List<Integer> availableChannelList = new ArrayList<>();
-        Set<List<Integer>> combinations =  new HashSet<List<Integer>>();
+    public List<FailedProductDto> getFalseAlarmsForMachine(Long machineCode,Long rackCode,Long channelNumber){
+        List<Long> availableRackCodeList = new ArrayList<>();
+        List<Long> availableChannelList = new ArrayList<>();
+        Set<List<Long>> combinations =  new HashSet<List<Long>>();
         int mockedBatchSize = 200;  //temperily harde code the mocked data
         //1. pre-check of input parameters
-        if(machineCode !=null && machineCode < 0){
+        if(machineCode !=null && machineCode < 0L){
             throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
         }
-        if(rackCode !=null && rackCode < 0){
+        if(rackCode !=null && rackCode < 0L){
             throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
         }
-        if(channelNumber!=null && channelNumber < 0){
+        if(channelNumber!=null && channelNumber < 0L){
             throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
         }
-        if(machineCode == null || machineCode.equals(0)){
+        if(machineCode == null || machineCode.equals(0L)){
             //need a default machine id, should use all compatible rackCode, should use all available channel numbers
-            machineCode = 4;
+            machineCode = 4L;
         }
 
-        if(rackCode == null || rackCode.equals(0)){
+        if(rackCode == null || rackCode.equals(0L)){
             //use all available racks
             availableRackCodeList = getAvailableRackCodeList(machineCode);
         }else{
@@ -55,7 +58,7 @@ public class FalseAlarmService {
         }
         System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
 
-        if(channelNumber == null || channelNumber.equals(0)){
+        if(channelNumber == null || channelNumber.equals(0L)){
             availableChannelList = getAvailableChannelList(rackCode);
         }else{
             availableChannelList.add(channelNumber);
@@ -63,8 +66,8 @@ public class FalseAlarmService {
         System.out.println("availableChannelList:"+availableChannelList.toString());
 
         //build the combination set
-        for(Integer rack:availableRackCodeList){
-            for (Integer channel: availableChannelList){
+        for(Long rack:availableRackCodeList){
+            for (Long channel: availableChannelList){
                 combinations.add(List.of(machineCode,rack,channel));
             }
         }
@@ -73,20 +76,25 @@ public class FalseAlarmService {
 //        return null;
 
         List<FailedProductDto> FailedProductDtos = new ArrayList<>();
-        falseAlarmRepository.triggerStoredProcedure();
-        for(List<Integer>  combination : combinations){
+
+//        falseAlarmRepository.triggerStoredProcedure();
+        for(List<Long>  combination : combinations){
             System.out.println("combination:");
             for(int i=0;i<combination.size();i++){
                 System.out.println(combination.get(i));
             }
-
-            List<FalseAlarmMachineSummary> falseAlarmDataList = falseAlarmRepository.findByMachineParameters(combination.get(0),combination.get(1),combination.get(2));
-            System.out.println("falseAlarmDataList in loop:"+falseAlarmDataList.toString());
-            //construct dto based on retrieved data,put into the list to return
-            List<Integer> failedProductCountList =new ArrayList<>();
-            for(FalseAlarmMachineSummary summary:falseAlarmDataList){
-                failedProductCountList.add(summary.getFalseAlarmCount());
-            }
+//
+//            List<FalseAlarmMachineSummary> falseAlarmDataList = falseAlarmRepository.findByMachineParameters(combination.get(0),combination.get(1),combination.get(2));
+//            System.out.println("falseAlarmDataList in loop:"+falseAlarmDataList.toString());
+//            //construct dto based on retrieved data,put into the list to return
+//            List<Integer> failedProductCountList =new ArrayList<>();
+//            for(FalseAlarmMachineSummary summary:falseAlarmDataList){
+//                failedProductCountList.add(summary.getFalseAlarmCount());
+//            }
+        long latestProductSequence = getLatestProductSequence();
+        int mockedAnalyzeRange = 10; //temperily harde code the mocked data
+        List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
+            List<Long> failedProductCountList = calculateFailedProductCountInBatch(latestProductSequence, mockedBatchSize, mockedAnalyzeRange, failedCumulativeList);
             FailedProductDto dto =new FailedProductDto();
             dto.setMachineId(combination.get(0));
             dto.setRackId(combination.get(1));
@@ -107,8 +115,8 @@ public class FalseAlarmService {
      * @param rackCode rack Id
      * @return the available channel numbers that are on the provided machineCode
      * */
-    List<Integer> getAvailableChannelList(Integer rackCode) {
-        return (List.of(1,2)); //mocked data
+    List<Long> getAvailableChannelList(Long rackCode) {
+        return (List.of(1L,2L)); //mocked data
     }
 
     /**
@@ -116,13 +124,13 @@ public class FalseAlarmService {
     * @param machineCode machine Id
      * @return the available rack code that are compatible with provided machineCode
      * */
-    List<Integer> getAvailableRackCodeList(Integer machineCode) {
+    List<Long> getAvailableRackCodeList(Long machineCode) {
         //mocked logic
-        List<Integer> availableRacks = new ArrayList<>();
-        if(machineCode == null || machineCode.equals(4)){
-            availableRacks.add(104);
+        List<Long> availableRacks = new ArrayList<>();
+        if(machineCode == null || machineCode.equals(4L)){
+            availableRacks.add(104L);
         }else{
-            availableRacks.add(105);
+            availableRacks.add(105L);
         }
         return availableRacks;
     }
@@ -131,9 +139,11 @@ public class FalseAlarmService {
     /*
     * */
 
-    private int getLatestProductSequence(){
+    private long getLatestProductSequence(){
         //mocked logic
-        return 4800;
+//        return 4800L; //use this mocked data whin channelNumber=1
+        return 7200L;   //use this mocked data whin channelNumber=2
+
     }
     /*
     * This method is to calculate the failed product count in each batch

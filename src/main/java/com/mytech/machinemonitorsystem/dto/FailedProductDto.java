@@ -7,11 +7,11 @@ import java.util.Objects;
 
 @Data
 public class FailedProductDto {
-    private Integer machineId;  // for DTO, it is better to use Integer instead of int
-    private Integer rackId;
-    private Integer channelNumber;
+    private Long machineId;  // for DTO, it is better to use Integer instead of int
+    private Long rackId;
+    private Long channelNumber;
     private Integer batchSize;
-    private List<Integer> failedProductCount;
+    private List<Long> failedProductCount;
 
 // --- Constructors ---
 
@@ -20,7 +20,7 @@ public class FailedProductDto {
     }
 
     // All-argument constructor (useful for creating instances with all values)
-    public FailedProductDto(Integer machineId, Integer rackId, Integer channelNumber, Integer batchSize, List<Integer> failedProductCount) {
+    public FailedProductDto(Long machineId, Long rackId, Long channelNumber, Integer batchSize, List<Long> failedProductCount) {
         this.machineId = machineId;
         this.rackId = rackId;
         this.channelNumber = channelNumber;
@@ -30,15 +30,15 @@ public class FailedProductDto {
 
     // --- Getters ---
 
-    public Integer getMachineId() {
+    public Long getMachineId() {
         return machineId;
     }
 
-    public Integer getRackId() {
+    public Long getRackId() {
         return rackId;
     }
 
-    public Integer getChannelNumber() {
+    public Long getChannelNumber() {
         return channelNumber;
     }
 
@@ -46,21 +46,21 @@ public class FailedProductDto {
         return batchSize;
     }
 
-    public List<Integer> getFailedProductCount() {
+    public List<Long> getFailedProductCount() {
         return failedProductCount;
     }
 
     // --- Setters ---
 
-    public void setMachineId(Integer machineId) {
+    public void setMachineId(Long machineId) {
         this.machineId = machineId;
     }
 
-    public void setRackId(Integer rackId) {
+    public void setRackId(Long rackId) {
         this.rackId = rackId;
     }
 
-    public void setChannelNumber(Integer channelNumber) {
+    public void setChannelNumber(Long channelNumber) {
         this.channelNumber = channelNumber;
     }
 
@@ -68,7 +68,7 @@ public class FailedProductDto {
         this.batchSize = batchSize;
     }
 
-    public void setFailedProductCount(List<Integer> failedProductCount) {
+    public void setFailedProductCount(List<Long> failedProductCount) {
         this.failedProductCount = failedProductCount;
     }
 

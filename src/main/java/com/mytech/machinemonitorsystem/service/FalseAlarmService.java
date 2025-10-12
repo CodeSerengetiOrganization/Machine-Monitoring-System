@@ -35,20 +35,14 @@ public class FalseAlarmService {
         Set<List<Long>> combinations =  new HashSet<List<Long>>();
         int mockedBatchSize = 200;  //temperily harde code the mocked data
         //1. pre-check of input parameters
-        if(machineCode !=null && machineCode < 0L){
-            throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
-        }
-        if(rackCode !=null && rackCode < 0L){
-            throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
-        }
-        if(channelNumber!=null && channelNumber < 0L){
-            throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
-        }
-        if(machineCode == null || machineCode.equals(0L)){
-            //need a default machine id, should use all compatible rackCode, should use all available channel numbers
-            machineCode = 4L;
-        }
-
+        checkParameter(machineCode,rackCode,channelNumber);
+        //2.1 get a default machine id if not provided
+        long effectiveMachineCode = machineCode == null || machineCode.equals(0L) ? 4L : machineCode;
+//        if(machineCode == null || machineCode.equals(0L)){
+//            //need a default machine id, should use all compatible rackCode, should use all available channel numbers
+//            machineCode = 4L;
+//        }
+        //2.2 get all compatible rackCode,
         if(rackCode == null || rackCode.equals(0L)){
             //use all available racks
             availableRackCodeList = getAvailableRackCodeList(machineCode);
@@ -56,21 +50,19 @@ public class FalseAlarmService {
             //use current existing rack code
             availableRackCodeList.add(rackCode);
         }
-        System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
+//        System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
 
+        //2.3 get all available channel numbers
         if(channelNumber == null || channelNumber.equals(0L)){
             availableChannelList = getAvailableChannelList(rackCode);
         }else{
             availableChannelList.add(channelNumber);
         }
-        System.out.println("availableChannelList:"+availableChannelList.toString());
+//        System.out.println("availableChannelList:"+availableChannelList.toString());
 
         //build the combination set
-        for(Long rack:availableRackCodeList){
-            for (Long channel: availableChannelList){
-                combinations.add(List.of(machineCode,rack,channel));
-            }
-        }
+        combinations=buildMachineCombinations(effectiveMachineCode,availableRackCodeList,availableChannelList);
+
         //for debugging, print the combination
         System.out.println("build the combinations:" +combinations.toString());
 //        return null;
@@ -85,8 +77,9 @@ public class FalseAlarmService {
             }
 
             long latestProductSequence = getLatestProductSequence();
-            //todo: reomove the hard coded data
+            //todo: remove the hard coded data
             int mockedAnalyzeRange = 10; //temporarily hard code the mocked data
+            //todo: should use effectiveMachineCode in future,not hard code data
             List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
             List<Long> failedProductCountList = calculateFailedProductCountInBatch(latestProductSequence, mockedBatchSize, mockedAnalyzeRange, failedCumulativeList);
             FailedProductDto dto =new FailedProductDto();
@@ -100,6 +93,43 @@ public class FalseAlarmService {
         }
 //        System.out.println("FailedProductDtos:"+FailedProductDtos.toString());
         return FailedProductDtos;
+    }
+
+    /*
+    * This method build the Machine+Rack+ChannelNumber combination.
+    *  @param effectiveMachineCode   the unique code identifying the machine
+     * @param rackCode      the code identifying the rack which is compatible with the machine
+     * @param channelNumber the number identifying the specific channel of the rack to query
+
+     * */
+    private Set<List<Long>> buildMachineCombinations(long effectiveMachineCode, List<Long> availableRackCodeList, List<Long> availableChannelList) {
+        Set<List<Long>> combinations = new HashSet<List<Long>>();
+        for(Long rack:availableRackCodeList){
+            for (Long channel: availableChannelList){
+                combinations.add(List.of(effectiveMachineCode,rack,channel));
+            }
+        }
+        return combinations;
+    }
+
+
+    /*
+    * This method is to check the eligibility of parameters.
+     * @param machineCode   the unique code identifying the machine
+     * @param rackCode      the code identifying the rack which is compatible with the machine
+     * @param channelNumber the number identifying the specific channel of the rack to query
+     * */
+
+    private void checkParameter(Long machineCode,Long rackCode,Long channelNumber) {
+        if(machineCode !=null && machineCode < 0L){
+            throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
+        }
+        if(rackCode !=null && rackCode < 0L){
+            throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
+        }
+        if(channelNumber!=null && channelNumber < 0L){
+            throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
+        }
     }
 
     /**

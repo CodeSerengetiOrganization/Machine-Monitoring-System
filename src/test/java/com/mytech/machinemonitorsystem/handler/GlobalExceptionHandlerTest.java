@@ -39,7 +39,7 @@ public class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.statusCode").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.code").value("PARAMETER_TYPE_MISMATCH"))
-                .andExpect(jsonPath("$.message").value(containsString("Invalid value invalidMachineCode provided for parameter machineCode. Expected type: Integer")));
+                .andExpect(jsonPath("$.message").value(containsString("Invalid value invalidMachineCode provided for parameter machineCode. Expected type: Long")));
     }
     @Test
     public void shouldHandleNoHandlerFoundExceptionWhenUrlIncorrect() throws Exception {

@@ -169,13 +169,13 @@ public class FalseAlarmService {
     }
     /*
     * This method is to calculate the failed product count in each batch
-    * @param latestSeq the latest product sequence number
-    * @param batchSize the size of each batch
-    * @param analyzeRange the analyzeRange of how many batches to calculate(it should be multiple of batchSize)
-    * @param failedCumulativeList the list of FailedProductCumulative objects containing product sequence and cumulative fail count
+    * @param latestSeq: the latest product sequence number
+    * @param batchSize: the size of each batch
+    * @param batchCountToAnalyze: the batchCountToAnalyze of how many batches to calculate(it should be multiple of batchSize)
+    * @param failedCumulativeList: the list of FailedProductCumulative objects containing product sequence and cumulative fail count
     * @return a list of Long values representing the failed product count in each batch
     * */
-    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int analyzeRange, List<FailedProductCumulative> failedCumulativeList){
+    List<Long> calculateFailedProductCountInBatch1(long latestSeq, int batchSize, int batchCountToAnalyze, List<FailedProductCumulative> failedCumulativeList){
         if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -210,7 +210,7 @@ public class FalseAlarmService {
         //need a resultlist
         List<Long> resultList =new ArrayList<>();
 
-        while(seqIndex < seqList.size() && batchCounter<= analyzeRange){
+        while(seqIndex < seqList.size() && batchCounter<= batchCountToAnalyze){
 
             //no fialed product in the batch
             if(seqList.get(seqIndex) < batchEndSeq){
@@ -254,6 +254,67 @@ public class FalseAlarmService {
 
 
         System.out.println("resultList:"+resultList.toString());
+        return resultList;
+    }
+
+    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int batchCountToAnalyze, List<FailedProductCumulative> failedCumulativeList) {
+        if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> resultArray = new ArrayList<>();
+
+        // Sort descending by productSequence
+        List<FailedProductCumulative> sortedList = failedCumulativeList.stream()
+                .sorted(Comparator.comparing(FailedProductCumulative::getProductSequence).reversed())
+                .collect(Collectors.toList());
+
+        //create 2 helper list
+        List<Long> seqList = new ArrayList<>();
+        List<Long> cumuList = new ArrayList<>();
+        for (FailedProductCumulative item : sortedList) {
+            seqList.add(item.getProductSequence());
+            cumuList.add(item.getCumulativeFailCount());
+        }
+        System.out.println("seqList:" + seqList.toString());
+        System.out.println("cumuList:" + cumuList.toString());
+
+        //need a resultlist
+        List<Long> resultList =new ArrayList<>();
+
+
+        //need 2 index for seqList
+        int seqStartIndex = 0;
+        int seqEndIndex = 0;
+        int seqIndex = 0;
+        //1. calculate how many batches to analyze
+        //2. use for loop and batchCounter to analyze,
+        // in each loop, while-loop the seqList to check if the sequence is inside the current batch.
+        //find the first index and the last index, calculate the failed part count, add into result
+        long numberOfBatch = (long)Math.ceil((double)latestSeq/batchSize);
+        if(numberOfBatch <= 0){
+            throw new RuntimeException(String.format("Should have more than 0 batch to analyze. Current batch to analyze: %d",numberOfBatch));
+        }
+        for(int batchCounter = 1;batchCounter<=numberOfBatch;batchCounter++){
+            if(seqIndex < seqList.size()){
+                if(seqList.get(seqStartIndex) < latestSeq-batchSize*batchCounter){
+                    //no failed part in this batch
+                    resultList.add(0L);
+                    continue;
+                }
+            }else{
+                break;
+            }
+
+            while(seqIndex < seqList.size() && seqList.get(seqIndex) > latestSeq-batchSize*batchCounter){
+                seqIndex++;
+            }
+            seqEndIndex = seqIndex-1;
+            long failedCount = cumuList.get(seqStartIndex) - cumuList.get(seqEndIndex)+1;
+            resultList.add(failedCount);
+            //update index for next loop
+            seqStartIndex = seqIndex;
+            seqEndIndex = seqStartIndex;
+        }
         return resultList;
     }
 

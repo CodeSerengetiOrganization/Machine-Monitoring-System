@@ -10,8 +10,8 @@
 	</parent>
 	<groupId>com.mytech</groupId>
 	<artifactId>machinemonitorsystem</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>machinemonitorsystem</name>
 	<description>Demo project for Machine Monitor System</description>
 	<url/>
@@ -46,7 +46,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<scope>compile</scope>
 			<!-- Exclude the embedded Tomcat, this is to build war package for Jboss-->
-			<exclusions>
+<!--			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -63,29 +63,7 @@
 					<groupId>org.apache.tomcat.embed</groupId>
 					<artifactId>tomcat-embed-el</artifactId>
 				</exclusion>
-<!--				<exclusion>
-					<groupId>org.apache.tomcat.embed</groupId>
-					<artifactId>tomcat-embed-logging-juli</artifactId>
-				</exclusion>
-				&lt;!&ndash;				xclude spring-boot-starter-logging, this is to build war package for Jboss&ndash;&gt;
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-				&lt;!&ndash;				Exclude Log4j2 Dependencies, as JBoss WildFly will provide it&ndash;&gt;
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>loggi
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>-->
-			</exclusions>
+			</exclusions>-->
 		</dependency>
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -268,5 +246,40 @@
 				</dependency>
 			</dependencies>
 		</profile>
-	</profiles>
+        <profile>
+            <id>k8s</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- Embedded Tomcat for Spring Boot JAR -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <!-- Logging -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <!--temporally use local setup -->
+                <filters>
+                    <filter>src/main/resources/application-local.properties</filter>
+                </filters>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <executable>true</executable> <!-- makes fat jar executable -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>

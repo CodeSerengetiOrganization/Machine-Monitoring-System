@@ -35,20 +35,14 @@ public class FalseAlarmService {
         Set<List<Long>> combinations =  new HashSet<List<Long>>();
         int mockedBatchSize = 200;  //temperily harde code the mocked data
         //1. pre-check of input parameters
-        if(machineCode !=null && machineCode < 0L){
-            throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
-        }
-        if(rackCode !=null && rackCode < 0L){
-            throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
-        }
-        if(channelNumber!=null && channelNumber < 0L){
-            throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
-        }
-        if(machineCode == null || machineCode.equals(0L)){
-            //need a default machine id, should use all compatible rackCode, should use all available channel numbers
-            machineCode = 4L;
-        }
-
+        checkParameter(machineCode,rackCode,channelNumber);
+        //2.1 get a default machine id if not provided
+        long effectiveMachineCode = machineCode == null || machineCode.equals(0L) ? 4L : machineCode;
+//        if(machineCode == null || machineCode.equals(0L)){
+//            //need a default machine id, should use all compatible rackCode, should use all available channel numbers
+//            machineCode = 4L;
+//        }
+        //2.2 get all compatible rackCode,
         if(rackCode == null || rackCode.equals(0L)){
             //use all available racks
             availableRackCodeList = getAvailableRackCodeList(machineCode);
@@ -56,21 +50,19 @@ public class FalseAlarmService {
             //use current existing rack code
             availableRackCodeList.add(rackCode);
         }
-        System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
+//        System.out.println("availableRackCodeList:"+availableRackCodeList.toString());
 
+        //2.3 get all available channel numbers
         if(channelNumber == null || channelNumber.equals(0L)){
             availableChannelList = getAvailableChannelList(rackCode);
         }else{
             availableChannelList.add(channelNumber);
         }
-        System.out.println("availableChannelList:"+availableChannelList.toString());
+//        System.out.println("availableChannelList:"+availableChannelList.toString());
 
         //build the combination set
-        for(Long rack:availableRackCodeList){
-            for (Long channel: availableChannelList){
-                combinations.add(List.of(machineCode,rack,channel));
-            }
-        }
+        combinations=buildMachineCombinations(effectiveMachineCode,availableRackCodeList,availableChannelList);
+
         //for debugging, print the combination
         System.out.println("build the combinations:" +combinations.toString());
 //        return null;
@@ -85,8 +77,9 @@ public class FalseAlarmService {
             }
 
             long latestProductSequence = getLatestProductSequence();
-            //todo: reomove the hard coded data
+            //todo: remove the hard coded data
             int mockedAnalyzeRange = 10; //temporarily hard code the mocked data
+            //todo: should use effectiveMachineCode in future,not hard code data
             List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
             List<Long> failedProductCountList = calculateFailedProductCountInBatch(latestProductSequence, mockedBatchSize, mockedAnalyzeRange, failedCumulativeList);
             FailedProductDto dto =new FailedProductDto();
@@ -100,6 +93,43 @@ public class FalseAlarmService {
         }
 //        System.out.println("FailedProductDtos:"+FailedProductDtos.toString());
         return FailedProductDtos;
+    }
+
+    /*
+    * This method build the Machine+Rack+ChannelNumber combination.
+    *  @param effectiveMachineCode   the unique code identifying the machine
+     * @param rackCode      the code identifying the rack which is compatible with the machine
+     * @param channelNumber the number identifying the specific channel of the rack to query
+
+     * */
+    private Set<List<Long>> buildMachineCombinations(long effectiveMachineCode, List<Long> availableRackCodeList, List<Long> availableChannelList) {
+        Set<List<Long>> combinations = new HashSet<List<Long>>();
+        for(Long rack:availableRackCodeList){
+            for (Long channel: availableChannelList){
+                combinations.add(List.of(effectiveMachineCode,rack,channel));
+            }
+        }
+        return combinations;
+    }
+
+
+    /*
+    * This method is to check the eligibility of parameters.
+     * @param machineCode   the unique code identifying the machine
+     * @param rackCode      the code identifying the rack which is compatible with the machine
+     * @param channelNumber the number identifying the specific channel of the rack to query
+     * */
+
+    private void checkParameter(Long machineCode,Long rackCode,Long channelNumber) {
+        if(machineCode !=null && machineCode < 0L){
+            throw new IllegalArgumentException("machineCode should be greater than or equal to 0. Current machineCode:"+machineCode);
+        }
+        if(rackCode !=null && rackCode < 0L){
+            throw new IllegalArgumentException("rackCode should be greater than or equal to 0. Current rackCode:"+rackCode);
+        }
+        if(channelNumber!=null && channelNumber < 0L){
+            throw new IllegalArgumentException("channelNumber should be greater than or equal to 0. Current channelNumber:"+channelNumber);
+        }
     }
 
     /**
@@ -139,13 +169,13 @@ public class FalseAlarmService {
     }
     /*
     * This method is to calculate the failed product count in each batch
-    * @param latestSeq the latest product sequence number
-    * @param batchSize the size of each batch
-    * @param analyzeRange the analyzeRange of how many batches to calculate(it should be multiple of batchSize)
-    * @param failedCumulativeList the list of FailedProductCumulative objects containing product sequence and cumulative fail count
+    * @param latestSeq: the latest product sequence number
+    * @param batchSize: the size of each batch
+    * @param batchCountToAnalyze: the batchCountToAnalyze of how many batches to calculate(it should be multiple of batchSize)
+    * @param failedCumulativeList: the list of FailedProductCumulative objects containing product sequence and cumulative fail count
     * @return a list of Long values representing the failed product count in each batch
     * */
-    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int analyzeRange, List<FailedProductCumulative> failedCumulativeList){
+    List<Long> calculateFailedProductCountInBatch1(long latestSeq, int batchSize, int batchCountToAnalyze, List<FailedProductCumulative> failedCumulativeList){
         if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -180,7 +210,7 @@ public class FalseAlarmService {
         //need a resultlist
         List<Long> resultList =new ArrayList<>();
 
-        while(seqIndex < seqList.size() && batchCounter<= analyzeRange){
+        while(seqIndex < seqList.size() && batchCounter<= batchCountToAnalyze){
 
             //no fialed product in the batch
             if(seqList.get(seqIndex) < batchEndSeq){
@@ -224,6 +254,67 @@ public class FalseAlarmService {
 
 
         System.out.println("resultList:"+resultList.toString());
+        return resultList;
+    }
+
+    List<Long> calculateFailedProductCountInBatch(long latestSeq, int batchSize, int batchCountToAnalyze, List<FailedProductCumulative> failedCumulativeList) {
+        if (failedCumulativeList == null || failedCumulativeList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> resultArray = new ArrayList<>();
+
+        // Sort descending by productSequence
+        List<FailedProductCumulative> sortedList = failedCumulativeList.stream()
+                .sorted(Comparator.comparing(FailedProductCumulative::getProductSequence).reversed())
+                .collect(Collectors.toList());
+
+        //create 2 helper list
+        List<Long> seqList = new ArrayList<>();
+        List<Long> cumuList = new ArrayList<>();
+        for (FailedProductCumulative item : sortedList) {
+            seqList.add(item.getProductSequence());
+            cumuList.add(item.getCumulativeFailCount());
+        }
+        System.out.println("seqList:" + seqList.toString());
+        System.out.println("cumuList:" + cumuList.toString());
+
+        //need a resultlist
+        List<Long> resultList =new ArrayList<>();
+
+
+        //need 2 index for seqList
+        int seqStartIndex = 0;
+        int seqEndIndex = 0;
+        int seqIndex = 0;
+        //1. calculate how many batches to analyze
+        //2. use for loop and batchCounter to analyze,
+        // in each loop, while-loop the seqList to check if the sequence is inside the current batch.
+        //find the first index and the last index, calculate the failed part count, add into result
+        long numberOfBatch = (long)Math.ceil((double)latestSeq/batchSize);
+        if(numberOfBatch <= 0){
+            throw new RuntimeException(String.format("Should have more than 0 batch to analyze. Current batch to analyze: %d",numberOfBatch));
+        }
+        for(int batchCounter = 1;batchCounter<=numberOfBatch;batchCounter++){
+            if(seqIndex < seqList.size()){
+                if(seqList.get(seqStartIndex) < latestSeq-batchSize*batchCounter){
+                    //no failed part in this batch
+                    resultList.add(0L);
+                    continue;
+                }
+            }else{
+                break;
+            }
+
+            while(seqIndex < seqList.size() && seqList.get(seqIndex) > latestSeq-batchSize*batchCounter){
+                seqIndex++;
+            }
+            seqEndIndex = seqIndex-1;
+            long failedCount = cumuList.get(seqStartIndex) - cumuList.get(seqEndIndex)+1;
+            resultList.add(failedCount);
+            //update index for next loop
+            seqStartIndex = seqIndex;
+            seqEndIndex = seqStartIndex;
+        }
         return resultList;
     }
 

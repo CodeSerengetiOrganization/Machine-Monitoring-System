@@ -1,6 +1,6 @@
 package com.mytech.machinemonitorsystem.controller;
 
-import com.mytech.machinemonitorsystem.dto.FailedProductDto;
+import com.mytech.model.v1.FailedProductDto;
 import com.mytech.model.v1.MachineStatusRequest;
 import com.mytech.model.v1.MachineStatusResponse;
 import com.mytech.machinemonitorsystem.service.FalseAlarmService;
@@ -47,6 +47,7 @@ public class MachineMonitorController {
                    request.getMachineId(), request.getFixtureId(), request.getChannelNumber());
 
         // Build a mocked MachineStatusResponse using the local DTO constructor
+/*
         Long machineId = request.getMachineId();
         Long rackId = (request.getFixtureId() != null) ? request.getFixtureId().longValue() : 1L;
         Long channelNumber = (request.getChannelNumber() != null) ? request.getChannelNumber() : 1L;
@@ -60,9 +61,16 @@ public class MachineMonitorController {
         OffsetDateTime timestamp = OffsetDateTime.now();
 
         MachineStatusResponse response = new MachineStatusResponse(machineId, rackId, channelNumber, batchSize, failedProductCount, timestamp);
+*/
+        Long machineId = request.getMachineId();
+        Long rackId = (request.getFixtureId() != null) ? request.getFixtureId().longValue() : null;
+        Long channelNumber = request.getChannelNumber();
 
+        List<FailedProductDto> failedProductDtos = falseAlarmService.getFalseAlarmsForMachine(machineId, rackId, channelNumber);
+        MachineStatusResponse response = new MachineStatusResponse(failedProductDtos);
         logger.info("Successfully retrieved machine status for machineId: {}", machineId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .body(response);
     }
 
 }

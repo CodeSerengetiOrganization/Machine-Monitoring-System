@@ -1,11 +1,12 @@
 package com.mytech.machinemonitorsystem.service;
+
+import com.mytech.model.v1.FailedProductDto;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.mytech.machinemonitorsystem.dto.FailedProductDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

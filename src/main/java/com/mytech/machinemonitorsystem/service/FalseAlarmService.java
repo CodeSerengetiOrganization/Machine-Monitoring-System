@@ -1,6 +1,6 @@
 package com.mytech.machinemonitorsystem.service;
 
-import com.mytech.machinemonitorsystem.dto.FailedProductDto;
+import com.mytech.model.v1.FailedProductDto;
 import com.mytech.machinemonitorsystem.entity.FailedProductCumulative;
 import com.mytech.machinemonitorsystem.entity.FalseAlarmMachineSummary;
 import com.mytech.machinemonitorsystem.repository.FalseAlarmRepository;
@@ -82,13 +82,14 @@ public class FalseAlarmService {
             //todo: should use effectiveMachineCode in future,not hard code data
             List<FailedProductCumulative> failedCumulativeList = failedProductService.findByProductCodeAndStationCodeAndStationChannelNumber(112233L,combination.get(0),combination.get(2));
             List<Long> failedProductCountList = calculateFailedProductCountInBatch(latestProductSequence, mockedBatchSize, mockedAnalyzeRange, failedCumulativeList);
+            List<Integer> intFailedProductCountList = failedProductCountList.stream().map(Long::intValue).collect(Collectors.toList());
             FailedProductDto dto =new FailedProductDto();
             dto.setMachineId(combination.get(0));
             dto.setRackId(combination.get(1));
             dto.setChannelNumber(combination.get(2));
             dto.setBatchSize(mockedBatchSize);
 
-            dto.setFailedProductCount(failedProductCountList);
+            dto.setFailedProductCount(intFailedProductCountList);
             FailedProductDtos.add(dto);
         }
 //        System.out.println("FailedProductDtos:"+FailedProductDtos.toString());

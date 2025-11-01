@@ -1,6 +1,6 @@
 package com.mytech.machinemonitorsystem.scheduler;
 
-import com.mytech.machinemonitorsystem.dto.FailedProductDto;
+import com.mytech.model.v1.FailedProductDto;
 import com.mytech.machinemonitorsystem.entity.MachineUnit;
 import com.mytech.machinemonitorsystem.service.EmailService;
 import com.mytech.machinemonitorsystem.service.FalseAlarmService;
@@ -37,7 +37,7 @@ public class ProductionAlertScheduler {
         Set<Long> machineCodeInMailTitle = new HashSet<>();
         //0.define email list
         List<MachineUnit> machineUnitsForAlert =  new ArrayList<>();
-        Map<String, Long> failedProductMap = new HashMap<>();
+        Map<String, Integer> failedProductMap = new HashMap<>();
         //1. get failed production count for each combination of machineId+RackId+channelNumber use the count of last batch
         Set<MachineUnit> machineRackChannelCombinations = machineLineService.getMachineRackChannelCombinations();
         //2. check each combination, any one who reach the criteria, put into alertEmailMap
@@ -54,7 +54,8 @@ public class ProductionAlertScheduler {
                         failedProductDtosForMachineUnit.stream()
                                 .filter(Objects::nonNull)
                                 .forEach(dto->{
-                                    List<Long> failedProductCounts = dto.getFailedProductCount();
+                                    List<Integer> failedProductCounts = dto.getFailedProductCount();
+//                                    List<Integer> intFailedCounts = failedProductCounts.stream().map(Long::intValue).toList();
                                     if(failedProductCounts !=null){
                                         failedProductCounts.stream()
                                                 .filter(count->count>=7)
@@ -89,7 +90,7 @@ public class ProductionAlertScheduler {
         emailService.sendTemplatedHtmlEmail(to,subject,templateName,context);
     }
 
-    private String buildContentWithMachineUnitAndFailedCount(Map<String, Long> failedProductMap) {
+    private String buildContentWithMachineUnitAndFailedCount(Map<String, Integer> failedProductMap) {
 //        String content = "";
         StringBuilder content = new StringBuilder();
         if(failedProductMap != null && !failedProductMap.isEmpty()){

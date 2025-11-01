@@ -63,8 +63,8 @@ public class MachineMonitorController {
         MachineStatusResponse response = new MachineStatusResponse(machineId, rackId, channelNumber, batchSize, failedProductCount, timestamp);
 */
         Long machineId = request.getMachineId();
-        Long rackId = (request.getFixtureId() != null) ? request.getFixtureId().longValue() : 1L;
-        Long channelNumber = (request.getChannelNumber() != null) ? request.getChannelNumber() : 1L;
+        Long rackId = (request.getFixtureId() != null) ? request.getFixtureId().longValue() : null;
+        Long channelNumber = request.getChannelNumber();
 
         List<FailedProductDto> failedProductDtos = falseAlarmService.getFalseAlarmsForMachine(machineId, rackId, channelNumber);
         MachineStatusResponse response = new MachineStatusResponse(failedProductDtos);

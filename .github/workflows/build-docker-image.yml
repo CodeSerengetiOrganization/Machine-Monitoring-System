@@ -2,6 +2,7 @@ name: Build & Package MMS Backend
 
 # Trigger workflow on merge/push to develop and PRs targeting develop
 on:
+  workflow_dispatch:        # allows manual run & makes workflow visible
   push:
     branches:
       - develop

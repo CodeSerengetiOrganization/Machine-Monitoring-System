@@ -14,6 +14,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04  # pinned for reproducibility
 
+    permissions:
+      contents: read
+      packages: read       # REQUIRED for downloading dependency from GitHub Packages
+
     steps:
       # Step 1: Checkout the repo
       - name: Checkout repository
@@ -26,19 +30,41 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Step 3: Build Spring Boot JAR
+      # Step 3: Configure Maven settings.xml for GitHub Packages authentication
+      # This allows Maven to download machine-monitoring-system-config
+      - name: Configure Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml << 'EOF'
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${GITHUB_ACTOR}</username>
+                <password>${GITHUB_TOKEN}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 4: Build Spring Boot JAR
       - name: Build Spring Boot JAR
         run: mvn clean package -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # REQUIRED for package download
 
-      # Step 4: Build Docker image
+      # Step 5: Build Docker image
       - name: Build Docker image
         run: docker build -t mms-backend:1.0.0 .
 
-      # Step 5: Save Docker image as a .tar artifact
+      # Step 6: Save Docker image as a .tar artifact
       - name: Save Docker image to tar
         run: docker save -o mms-backend.tar mms-backend:1.0.0
 
-      # Step 6: Upload Docker image artifact
+      # Step 7: Upload Docker image artifact (GitHub Packages v4 syntax)
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:

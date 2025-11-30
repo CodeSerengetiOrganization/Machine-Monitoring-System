@@ -117,7 +117,15 @@
 		</dependency>
 	</dependencies>
 
-	<build>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/CodeSerengetiOrganization/Machine-Monitoring-System-Config</url>
+        </repository>
+    </repositories>
+
+
+    <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

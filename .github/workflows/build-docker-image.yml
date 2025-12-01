@@ -67,7 +67,7 @@ jobs:
           echo "Building Docker image with version $VERSION"
           docker build -t mms-backend:$VERSION .
           docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:$VERSION
-          docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:latest
+        # docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:latest
 
       # ADDED: Step 7 — Push Docker image to GHCR
       - name: Push Docker image to GHCR

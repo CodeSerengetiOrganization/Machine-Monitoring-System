@@ -67,17 +67,24 @@ jobs:
           echo "Building Docker image with version $VERSION"
           docker build -t mms-backend:$VERSION .
           docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:$VERSION
-        # docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:latest
+          # docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:latest
 
       # ADDED: Step 7 — Push Docker image to GHCR
       - name: Push Docker image to GHCR
         run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Pushing Docker image with version $VERSION"
+          docker push ghcr.io/codeserengetiorganization/mms-backend:$VERSION
           docker push ghcr.io/codeserengetiorganization/mms-backend:latest
 
       # Step 8: (Optional) Save Docker image as a .tar artifact
       # This is still useful for anyone wanting to download the image manually
       - name: Save Docker image to tar
-        run: docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:latest
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Pushing Docker image with version $VERSION"
+          docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:$VERSION
+          docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:latest
 
       # Step 9: Upload Docker image artifact (GitHub Packages v4 syntax)
       - name: Upload Docker image artifact

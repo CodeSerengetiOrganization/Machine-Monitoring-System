@@ -63,7 +63,11 @@ jobs:
       # ADDED: Step 6 — Build Docker image with GHCR naming convention
       - name: Build Docker image for GHCR
         run: |
-          docker build -t ghcr.io/codeserengetiorganization/mms-backend:latest .
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Building Docker image with version $VERSION"
+          docker build -t mms-backend:$VERSION .
+          docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:$VERSION
+          docker tag mms-backend:$VERSION ghcr.io/codeserengetiorganization/mms-backend:latest
 
       # ADDED: Step 7 — Push Docker image to GHCR
       - name: Push Docker image to GHCR

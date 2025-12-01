@@ -16,7 +16,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: read       # REQUIRED for downloading dependency from GitHub Packages
+      packages: write       # CHANGED: write is required to push docker image to GHCR
 
     steps:
       # Step 1: Checkout the repo
@@ -56,15 +56,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # REQUIRED for package download
 
-      # Step 5: Build Docker image
-      - name: Build Docker image
-        run: docker build -t mms-backend:1.0.0 .
+      # ADDED: Step 5 — Log in to GitHub Container Registry (GHCR)
+      - name: Login to GitHub Container Registry (GHCR)
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # Step 6: Save Docker image as a .tar artifact
+      # ADDED: Step 6 — Build Docker image with GHCR naming convention
+      - name: Build Docker image for GHCR
+        run: |
+          docker build -t ghcr.io/codeserengetiorganization/mms-backend:latest .
+
+      # ADDED: Step 7 — Push Docker image to GHCR
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ghcr.io/codeserengetiorganization/mms-backend:latest
+
+      # Step 8: (Optional) Save Docker image as a .tar artifact
+      # This is still useful for anyone wanting to download the image manually
       - name: Save Docker image to tar
-        run: docker save -o mms-backend.tar mms-backend:1.0.0
+        run: docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:latest
 
-      # Step 7: Upload Docker image artifact (GitHub Packages v4 syntax)
+      # Step 9: Upload Docker image artifact (GitHub Packages v4 syntax)
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:

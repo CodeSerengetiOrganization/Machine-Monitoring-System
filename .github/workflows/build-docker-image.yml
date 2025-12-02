@@ -86,7 +86,7 @@ jobs:
       - name: Save Docker image to tar
         run: |
           echo "Saving Docker image with version $PROJECT_VERSION"
-          docker save -o mms-backend-${PROJECT_VERSION}.tar ghcr.io/codeserengetiorganization/mms-backend:${PROJECT_VERSION}
+          docker save -o mms-backend-$PROJECT_VERSION.tar ghcr.io/codeserengetiorganization/mms-backend:$PROJECT_VERSION
           docker save -o mms-backend-latest.tar ghcr.io/codeserengetiorganization/mms-backend:latest
 
 

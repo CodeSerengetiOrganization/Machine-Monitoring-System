@@ -86,12 +86,13 @@ jobs:
       - name: Save Docker image to tar
         run: |
           echo "Saving Docker image with version $PROJECT_VERSION"
-          docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:$PROJECT_VERSION
-          docker save -o mms-backend.tar ghcr.io/codeserengetiorganization/mms-backend:latest
+          docker save -o mms-backend-$PROJECT_VERSION.tar ghcr.io/...:$PROJECT_VERSION
+          docker save -o mms-backend-latest.tar ghcr.io/...:latest
+
 
       # Step 10: Upload Docker image artifact (GitHub Packages v4 syntax)
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mms-backend-image-PROJECT_VERSION    # artifact name in GitHub UI
-          path: mms-backend-PROJECT_VERSION.tar      # matches the file you just saved
+          name: mms-backend-image-${{ env.PROJECT_VERSION }}    # artifact name in GitHub UI
+          path: mms-backend-${{ env.PROJECT_VERSION }}.tar      # matches the file you just saved

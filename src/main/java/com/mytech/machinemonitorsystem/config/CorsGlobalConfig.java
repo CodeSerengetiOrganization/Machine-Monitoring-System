@@ -6,6 +6,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -15,6 +16,8 @@ public class CorsGlobalConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:4200");
 //        corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:8180"));
+        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200",
+                                                            "http://172.26.44.42:30080"));
         corsConfiguration.setAllowedOrigins(corsProperties.getAllowedOrigins());
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");

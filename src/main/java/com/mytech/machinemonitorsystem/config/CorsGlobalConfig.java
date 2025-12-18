@@ -6,19 +6,28 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class CorsGlobalConfig {
     @Bean
     public CorsFilter corsFilter(CorsProperties corsProperties) {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:4200");
-//        corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:8180"));
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200",
-                                                            "http://172.26.44.42:30080"));
-        corsConfiguration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+// 1. Combine all possible origins
+        List<String> allowedOrigins = new ArrayList<>();
+        allowedOrigins.add("http://localhost:4200");
+        allowedOrigins.add("http://172.26.44.42:30080");
+
+        // Add everything from your properties file
+        if (corsProperties.getAllowedOrigins() != null) {
+            allowedOrigins.addAll(corsProperties.getAllowedOrigins());
+        }
+
+        // 2. Set the origins ONCE
+        corsConfiguration.setAllowedOrigins(allowedOrigins);
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);

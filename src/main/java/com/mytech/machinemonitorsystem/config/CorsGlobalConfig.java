@@ -16,10 +16,8 @@ public class CorsGlobalConfig {
     @Bean
     public CorsFilter corsFilter(CorsProperties corsProperties) {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-// 1. Combine all possible origins
+        // 1. Combine all possible origins
         List<String> allowedOrigins = new ArrayList<>();
-        allowedOrigins.add("http://localhost:4200");
-        allowedOrigins.add("http://172.26.44.42:30080");
 
         // Add everything from your properties file
         if (corsProperties.getAllowedOrigins() != null) {
